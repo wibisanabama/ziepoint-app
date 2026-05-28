@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/siswa.dart';
 import 'jenis_catatan_page.dart';
 import 'login_page.dart';
+import 'riwayat_catatan_page.dart';
 
 class StudentHomePage extends StatefulWidget {
   final Siswa siswa;
@@ -255,7 +256,14 @@ class _StudentHomePageState extends State<StudentHomePage> {
                   ),
                 ),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RiwayatCatatanPage(siswa: widget.siswa),
+                      ),
+                    );
+                  },
                   child: const Text(
                     'Lihat Semua',
                     style: TextStyle(color: Color(0xFF8A6E6A)),
