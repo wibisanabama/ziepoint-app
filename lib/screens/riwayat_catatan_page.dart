@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../models/siswa.dart';
-import 'login_page.dart';
 
 class RiwayatCatatanPage extends StatefulWidget {
   final Siswa siswa;
@@ -64,33 +63,6 @@ class _RiwayatCatatanPageState extends State<RiwayatCatatanPage> {
     },
   ];
 
-  void _showLogoutDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Konfirmasi Keluar"),
-          content: const Text("Apakah Anda yakin ingin keluar dari akun?"),
-          actions: [
-            TextButton(
-              child: const Text("Batal"),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            TextButton(
-              child: const Text("Keluar", style: TextStyle(color: Colors.red)),
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                );
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -109,22 +81,6 @@ class _RiwayatCatatanPageState extends State<RiwayatCatatanPage> {
             fontSize: 18,
           ),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: GestureDetector(
-              onTap: _showLogoutDialog,
-              child: CircleAvatar(
-                radius: 18,
-                backgroundColor: const Color(0xFFD3AFAE).withValues(alpha: 0.3),
-                child: const Icon(
-                  Icons.person,
-                  color: Color(0xFF8A6E6A),
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),

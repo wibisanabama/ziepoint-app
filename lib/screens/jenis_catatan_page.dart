@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../models/jenis_catatan.dart';
 import '../models/siswa.dart';
 import '../services/api_service.dart';
-import 'login_page.dart';
 
 class JenisCatatanPage extends StatefulWidget {
   final String tipe; // 'pelanggaran' or 'prestasi'
@@ -18,34 +17,6 @@ class _JenisCatatanPageState extends State<JenisCatatanPage> {
   final ApiService _apiService = ApiService();
   List<JenisCatatan> _catatanList = [];
   bool _isLoading = true;
-
-  void _showLogoutDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Konfirmasi Keluar"),
-          content: const Text("Apakah Anda yakin ingin keluar dari akun?"),
-          actions: [
-            TextButton(
-              child: const Text("Batal"),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            TextButton(
-              child: const Text("Keluar", style: TextStyle(color: Colors.red)),
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                );
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   void initState() {
@@ -112,23 +83,6 @@ class _JenisCatatanPageState extends State<JenisCatatanPage> {
             fontSize: 18,
           ),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: GestureDetector(
-              onTap: _showLogoutDialog,
-              child: CircleAvatar(
-                radius: 16,
-                backgroundColor: Colors.grey.shade300,
-                child: const Icon(
-                  Icons.person,
-                  color: Color(0xFF37474F),
-                  size: 18,
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
