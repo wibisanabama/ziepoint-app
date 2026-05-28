@@ -260,93 +260,106 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: const Color(0xFFF8F9FA),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _siswaList.isEmpty
               ? const Center(child: Text('Tidak ada data siswa'))
-              : ListView.builder(
+              : ListView(
                   padding: const EdgeInsets.all(16.0),
-                  itemCount: _siswaList.length,
-                  itemBuilder: (context, index) {
-                    final siswa = _siswaList[index];
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 12.0),
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(color: Colors.grey.shade200),
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF2ECEB),
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    siswa.nama,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF6B5B5A),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '${siswa.kelas} • NIS: ${siswa.nis} ',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey.shade600,
-                                    ),
-                                  ),
-                                ],
+                      child: Column(
+                        children: [
+                          for (int i = 0; i < _siswaList.length; i++) ...[
+                            _buildSiswaTile(_siswaList[i]),
+                            if (i < _siswaList.length - 1)
+                              const Divider(
+                                color: Colors.white30,
+                                height: 1,
+                                indent: 16,
+                                endIndent: 16,
                               ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.edit, color: Color(0xFF6B5B5A)),
-                              onPressed: () => _showFormDialog(siswa: siswa),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete_outline, color: Colors.red),
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: const Text("Konfirmasi"),
-                                      content: const Text("Yakin ingin menghapus data ini?"),
-                                      actions: [
-                                        TextButton(
-                                          child: const Text("Batal"),
-                                          onPressed: () => Navigator.of(context).pop(),
-                                        ),
-                                        TextButton(
-                                          child: const Text("Hapus", style: TextStyle(color: Colors.red)),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                            if (siswa.id != null) {
-                                              _deleteSiswa(siswa.id!);
-                                            }
-                                          },
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
-                            ),
                           ],
-                        ),
+                        ],
                       ),
-                    );
-                  },
+                    ),
+                  ],
                 ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showFormDialog(),
         backgroundColor: const Color(0xFF8A6E6A),
         child: const Icon(Icons.add, color: Colors.white),
+      ),
+    );
+  }
+
+  Widget _buildSiswaTile(Siswa siswa) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  siswa.nama,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF151C3B), // Navy blue
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${siswa.kelas} • NIS: ${siswa.nis}',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.edit, color: Color(0xFF8A6E6A)),
+            onPressed: () => _showFormDialog(siswa: siswa),
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_outline, color: Colors.red),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text("Konfirmasi"),
+                    content: const Text("Yakin ingin menghapus data ini?"),
+                    actions: [
+                      TextButton(
+                        child: const Text("Batal"),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                      TextButton(
+                        child: const Text("Hapus", style: TextStyle(color: Colors.red)),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          if (siswa.id != null) {
+                            _deleteSiswa(siswa.id!);
+                          }
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+          ),
+        ],
       ),
     );
   }
