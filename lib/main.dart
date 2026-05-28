@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/login_page.dart';
+import 'theme.dart';
 
 void main() {
   runApp(const MainApp());
@@ -10,13 +11,13 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final theme = MaterialTheme(textTheme);
+
     return MaterialApp(
       title: 'Data Siswa',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF8A6E6A)),
-        useMaterial3: true,
-      ),
+      theme: theme.light(),
       home: const LoginPage(),
     );
   }
