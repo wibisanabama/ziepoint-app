@@ -37,9 +37,6 @@ class _LoginPageState extends State<LoginPage> {
       if (_isSiswa) {
         final siswa = await _apiService.loginSiswa(identifier, password);
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Selamat datang, ${siswa.nama}!')),
-        );
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => StudentHomePage(siswa: siswa)),
@@ -47,9 +44,6 @@ class _LoginPageState extends State<LoginPage> {
       } else {
         final guru = await _apiService.loginGuru(identifier, password);
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Selamat datang, Guru ${guru.nama}!')),
-        );
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const HomePage(role: 'guru')),
