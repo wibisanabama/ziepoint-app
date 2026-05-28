@@ -56,9 +56,9 @@ class _JenisCatatanPageState extends State<JenisCatatanPage> {
       if (poin >= 20) return const Color(0xFF43A047); // Green
       return const Color(0xFF1E88E5); // Blue
     } else {
-      if (poin >= 75) return const Color(0xFFB71C1C); // Red for severe
-      if (poin >= 40) return const Color(0xFFE64A19); // Orange for moderate
-      return const Color(0xFF1A237E); // Dark blue for minor
+      if (poin >= 75) return const Color(0xFFB71C1C); // Dark red for severe
+      if (poin >= 40) return const Color(0xFFE64A19); // Orange-red for moderate
+      return const Color(0xFFEF5350); // Soft red for minor
     }
   }
 
