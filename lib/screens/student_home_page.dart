@@ -265,8 +265,27 @@ class _StudentHomePageState extends State<StudentHomePage> {
             ),
             const SizedBox(height: 8),
 
-            // List of Recent Activities
-            ..._recentActivities.map((activity) => _buildActivityTile(activity)),
+            // Segmented (filled) Container for activities
+            Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFFF2ECEB),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                children: [
+                  for (int i = 0; i < _recentActivities.length; i++) ...[
+                    _buildActivityTile(_recentActivities[i]),
+                    if (i < _recentActivities.length - 1)
+                      const Divider(
+                        color: Colors.white30,
+                        height: 1,
+                        indent: 16,
+                        endIndent: 16,
+                      ),
+                  ],
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -325,14 +344,8 @@ class _StudentHomePageState extends State<StudentHomePage> {
 
   Widget _buildActivityTile(Map<String, dynamic> activity) {
     final bool isPositive = activity['isPositive'];
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12.0),
+    return Padding(
       padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade100),
-      ),
       child: Row(
         children: [
           Container(
@@ -365,7 +378,7 @@ class _StudentHomePageState extends State<StudentHomePage> {
                   '${activity['category']} • ${activity['date']}',
                   style: TextStyle(
                     fontSize: 11,
-                    color: Colors.grey.shade500,
+                    color: Colors.grey.shade600,
                   ),
                 ),
               ],
