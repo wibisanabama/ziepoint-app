@@ -59,7 +59,7 @@ class _StudentHomePageState extends State<StudentHomePage> {
             padding: const EdgeInsets.only(right: 16.0),
             child: CircleAvatar(
               radius: 18,
-              backgroundColor: const Color(0xFFD3AFAE).withOpacity(0.3),
+              backgroundColor: const Color(0xFFD3AFAE).withValues(alpha: 0.3),
               child: const Text(
                 '🎓',
                 style: TextStyle(fontSize: 18),
@@ -86,7 +86,7 @@ class _StudentHomePageState extends State<StudentHomePage> {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF8A6E6A).withOpacity(0.3),
+                    color: const Color(0xFF8A6E6A).withValues(alpha: 0.3),
                     blurRadius: 15,
                     offset: const Offset(0, 8),
                   ),
@@ -122,7 +122,7 @@ class _StudentHomePageState extends State<StudentHomePage> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(30),
                         ),
                         child: Text(
@@ -309,7 +309,7 @@ class _StudentHomePageState extends State<StudentHomePage> {
             Container(
               padding: const EdgeInsets.all(10.0),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: color, size: 28),
@@ -353,7 +353,7 @@ class _StudentHomePageState extends State<StudentHomePage> {
           Container(
             padding: const EdgeInsets.all(8.0),
             decoration: BoxDecoration(
-              color: (isPositive ? const Color(0xFF43A047) : const Color(0xFFB71C1C)).withOpacity(0.1),
+              color: (isPositive ? const Color(0xFF43A047) : const Color(0xFFB71C1C)).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(

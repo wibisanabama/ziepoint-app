@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import 'home_page.dart';
-import 'jenis_catatan_page.dart';
 import 'student_home_page.dart';
 
 class LoginPage extends StatefulWidget {
