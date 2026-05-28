@@ -15,6 +15,8 @@ class _HomePageState extends State<HomePage> {
   final ApiService _apiService = ApiService();
   List<Siswa> _siswaList = [];
   bool _isLoading = true;
+  final ScrollController _scrollController = ScrollController();
+  bool _isScrolled = false;
 
   void _showLogoutDialog() {
     showDialog(
@@ -48,6 +50,27 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _fetchSiswa();
+    _scrollController.addListener(() {
+      if (_scrollController.offset > 10) {
+        if (!_isScrolled) {
+          setState(() {
+            _isScrolled = true;
+          });
+        }
+      } else {
+        if (_isScrolled) {
+          setState(() {
+            _isScrolled = false;
+          });
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchSiswa() async {
@@ -238,21 +261,28 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Data Siswa', style: TextStyle(color: Colors.white)),
-        backgroundColor: const Color(0xFF8A6E6A),
-        centerTitle: true,
+        title: Text(
+          'Data Siswa',
+          style: TextStyle(
+            color: _isScrolled ? Colors.white : const Color(0xFF151C3B),
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+        backgroundColor: _isScrolled ? const Color(0xFF8A6E6A) : Colors.transparent,
         elevation: 0,
+        centerTitle: true,
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: GestureDetector(
               onTap: _showLogoutDialog,
-              child: const CircleAvatar(
+              child: CircleAvatar(
                 radius: 16,
-                backgroundColor: Colors.white24,
+                backgroundColor: _isScrolled ? Colors.white24 : const Color(0xFFD3AFAE).withValues(alpha: 0.3),
                 child: Icon(
                   Icons.person,
-                  color: Colors.white,
+                  color: _isScrolled ? Colors.white : const Color(0xFF8A6E6A),
                   size: 20,
                 ),
               ),
@@ -266,6 +296,7 @@ class _HomePageState extends State<HomePage> {
           : _siswaList.isEmpty
               ? const Center(child: Text('Tidak ada data siswa'))
               : ListView(
+                  controller: _scrollController,
                   padding: const EdgeInsets.all(16.0),
                   children: [
                     Container(
