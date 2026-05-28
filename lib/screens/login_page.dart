@@ -72,8 +72,10 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -82,19 +84,19 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Icon(
+                Icon(
                   Icons.school,
                   size: 80,
-                  color: Color(0xFF8A6E6A),
+                  color: colorScheme.primary,
                 ),
                 const SizedBox(height: 32),
-                const Text(
+                Text(
                   'Selamat Datang',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF151C3B),
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -103,7 +105,7 @@ class _LoginPageState extends State<LoginPage> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey.shade600,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -115,17 +117,17 @@ class _LoginPageState extends State<LoginPage> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
-                            color: _isSiswa ? const Color(0xFF8A6E6A) : Colors.transparent,
+                            color: _isSiswa ? colorScheme.primary : Colors.transparent,
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: _isSiswa ? const Color(0xFF8A6E6A) : Colors.grey.shade300,
+                              color: _isSiswa ? colorScheme.primary : colorScheme.outlineVariant,
                             ),
                           ),
                           child: Center(
                             child: Text(
                               'Siswa',
                               style: TextStyle(
-                                color: _isSiswa ? Colors.white : Colors.grey.shade700,
+                                color: _isSiswa ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -140,17 +142,17 @@ class _LoginPageState extends State<LoginPage> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
-                            color: !_isSiswa ? const Color(0xFF8A6E6A) : Colors.transparent,
+                            color: !_isSiswa ? colorScheme.primary : Colors.transparent,
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: !_isSiswa ? const Color(0xFF8A6E6A) : Colors.grey.shade300,
+                              color: !_isSiswa ? colorScheme.primary : colorScheme.outlineVariant,
                             ),
                           ),
                           child: Center(
                             child: Text(
                               'Guru',
                               style: TextStyle(
-                                color: !_isSiswa ? Colors.white : Colors.grey.shade700,
+                                color: !_isSiswa ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -203,19 +205,19 @@ class _LoginPageState extends State<LoginPage> {
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _handleLogin,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8A6E6A),
-                      foregroundColor: Colors.white,
+                      backgroundColor: colorScheme.primary,
+                      foregroundColor: colorScheme.onPrimary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                       elevation: 0,
                     ),
                     child: _isLoading
-                        ? const SizedBox(
+                        ? SizedBox(
                             width: 24,
                             height: 24,
                             child: CircularProgressIndicator(
-                              color: Colors.white,
+                              color: colorScheme.onPrimary,
                               strokeWidth: 2,
                             ),
                           )
