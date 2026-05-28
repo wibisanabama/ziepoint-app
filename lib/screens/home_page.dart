@@ -331,6 +331,8 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showFormDialog(),
         backgroundColor: colorScheme.primary,
+        elevation: 0,
+        highlightElevation: 0,
         child: Icon(Icons.add, color: colorScheme.onPrimary),
       ),
     );
