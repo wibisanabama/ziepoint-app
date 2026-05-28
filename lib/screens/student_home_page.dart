@@ -90,9 +90,9 @@ class _StudentHomePageState extends State<StudentHomePage> {
               child: CircleAvatar(
                 radius: 18,
                 backgroundColor: const Color(0xFFD3AFAE).withValues(alpha: 0.3),
-                child: const Text(
-                  '🎓',
-                  style: TextStyle(fontSize: 18),
+                child: const Icon(
+                  Icons.person,
+                  color: Color(0xFF8A6E6A),
                 ),
               ),
             ),

@@ -120,7 +120,11 @@ class _JenisCatatanPageState extends State<JenisCatatanPage> {
               child: CircleAvatar(
                 radius: 16,
                 backgroundColor: Colors.grey.shade300,
-                backgroundImage: const NetworkImage('https://i.pravatar.cc/150?img=11'), // Placeholder image like the design
+                child: const Icon(
+                  Icons.person,
+                  color: Color(0xFF37474F),
+                  size: 18,
+                ),
               ),
             ),
           ),
