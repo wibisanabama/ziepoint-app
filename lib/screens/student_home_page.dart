@@ -108,19 +108,8 @@ class _StudentHomePageState extends State<StudentHomePage> {
             Container(
               padding: const EdgeInsets.all(24.0),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF8A6E6A), Color(0xFFB39895)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                color: const Color(0xFF8A6E6A),
                 borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF8A6E6A).withValues(alpha: 0.3),
-                    blurRadius: 15,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,50 +158,24 @@ class _StudentHomePageState extends State<StudentHomePage> {
                   const SizedBox(height: 24),
                   const Divider(color: Colors.white30, height: 1),
                   const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'NOMOR INDUK SISWA (NIS)',
-                            style: TextStyle(
-                              color: Colors.white60,
-                              fontSize: 10,
-                              letterSpacing: 1.2,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            widget.siswa.nis,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
+                      const Text(
+                        'NOMOR INDUK SISWA (NIS)',
+                        style: TextStyle(
+                          color: Colors.white60,
+                          fontSize: 10,
+                          letterSpacing: 1.2,
                         ),
-                        child: const Row(
-                          children: [
-                            Icon(Icons.shield, color: Color(0xFF43A047), size: 16),
-                            SizedBox(width: 6),
-                            Text(
-                              'Status: Aman',
-                              style: TextStyle(
-                                color: Color(0xFF43A047),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        widget.siswa.nis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
