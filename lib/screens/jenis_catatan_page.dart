@@ -137,14 +137,13 @@ class _JenisCatatanPageState extends State<JenisCatatanPage> {
               child: ListView(
                 padding: const EdgeInsets.all(16.0),
                 children: [
-                  // Header Card
+                  // Header Card (Filled, no shadow, no border)
                   Container(
                     margin: const EdgeInsets.only(bottom: 24.0),
                     padding: const EdgeInsets.all(20.0),
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade100),
+                      color: const Color(0xFFF2ECEB),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,26 +174,39 @@ class _JenisCatatanPageState extends State<JenisCatatanPage> {
                     ),
                   ),
                   
-                  // List of items
+                  // List of items (Segmented filled container with no shadow and no outer border)
                   if (_catatanList.isEmpty)
-                    Center(child: Text('Tidak ada data jenis ${widget.tipe}')),
-                  
-                  ..._catatanList.map((catatan) => _buildCatatanCard(catatan)),
+                    Center(child: Text('Tidak ada data jenis ${widget.tipe}'))
+                  else
+                    Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF2ECEB),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Column(
+                        children: [
+                          for (int i = 0; i < _catatanList.length; i++) ...[
+                            _buildCatatanTile(_catatanList[i]),
+                            if (i < _catatanList.length - 1)
+                              const Divider(
+                                color: Colors.white30,
+                                height: 1,
+                                indent: 20,
+                                endIndent: 20,
+                              ),
+                          ],
+                        ],
+                      ),
+                    ),
                 ],
               ),
             ),
     );
   }
 
-  Widget _buildCatatanCard(JenisCatatan catatan) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16.0),
+  Widget _buildCatatanTile(JenisCatatan catatan) {
+    return Padding(
       padding: const EdgeInsets.all(20.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
