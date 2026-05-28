@@ -42,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
           MaterialPageRoute(builder: (context) => StudentHomePage(siswa: siswa)),
         );
       } else {
-        final guru = await _apiService.loginGuru(identifier, password);
+        await _apiService.loginGuru(identifier, password);
         if (!mounted) return;
         Navigator.pushReplacement(
           context,
