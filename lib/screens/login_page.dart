@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import 'home_page.dart';
 import 'jenis_catatan_page.dart';
+import 'student_home_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -40,21 +41,16 @@ class _LoginPageState extends State<LoginPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Selamat datang, ${siswa.nama}!')),
         );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => StudentHomePage(siswa: siswa)),
+        );
       } else {
         final guru = await _apiService.loginGuru(identifier, password);
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Selamat datang, Guru ${guru.nama}!')),
         );
-      }
-      
-      if (!mounted) return;
-      if (_isSiswa) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const JenisCatatanPage(tipe: 'pelanggaran', role: 'siswa')),
-        );
-      } else {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const HomePage(role: 'guru')),

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import '../models/jenis_catatan.dart';
+import '../models/siswa.dart';
 import '../services/api_service.dart';
 import '../widgets/app_drawer.dart';
 
 class JenisCatatanPage extends StatefulWidget {
   final String tipe; // 'pelanggaran' or 'prestasi'
   final String role;
-  const JenisCatatanPage({super.key, required this.tipe, required this.role});
+  final Siswa? siswa;
+  const JenisCatatanPage({super.key, required this.tipe, required this.role, this.siswa});
 
   @override
   State<JenisCatatanPage> createState() => _JenisCatatanPageState();
@@ -93,7 +95,7 @@ class _JenisCatatanPageState extends State<JenisCatatanPage> {
           ),
         ],
       ),
-      drawer: AppDrawer(role: widget.role),
+      drawer: AppDrawer(role: widget.role, siswa: widget.siswa),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
