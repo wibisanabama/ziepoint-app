@@ -138,10 +138,10 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Text(
                   isEditing ? 'Update Data Siswa' : 'Tambah Data Siswa',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF8A6E6A),
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -209,8 +209,8 @@ class _HomePageState extends State<HomePage> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF8A6E6A),
-                    foregroundColor: Colors.white,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25),
@@ -239,6 +239,7 @@ class _HomePageState extends State<HomePage> {
     required String label,
     bool obscureText = false,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     return TextField(
       controller: controller,
       obscureText: obscureText,
@@ -254,7 +255,7 @@ class _HomePageState extends State<HomePage> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.0),
-          borderSide: const BorderSide(color: Color(0xFF8A6E6A)),
+          borderSide: BorderSide(color: colorScheme.primary),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
@@ -263,17 +264,19 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
           'Data Siswa',
           style: TextStyle(
-            color: _isScrolled ? Colors.white : const Color(0xFF151C3B),
+            color: _isScrolled ? colorScheme.onPrimary : colorScheme.onSurface,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
         ),
-        backgroundColor: _isScrolled ? const Color(0xFF8A6E6A) : Colors.transparent,
+        backgroundColor: _isScrolled ? colorScheme.primary : Colors.transparent,
         elevation: 0,
         centerTitle: true,
         actions: [
@@ -283,10 +286,10 @@ class _HomePageState extends State<HomePage> {
               onTap: _showLogoutDialog,
               child: CircleAvatar(
                 radius: 16,
-                backgroundColor: _isScrolled ? Colors.white24 : const Color(0xFFD3AFAE).withValues(alpha: 0.3),
+                backgroundColor: _isScrolled ? colorScheme.onPrimary.withValues(alpha: 0.2) : colorScheme.primary.withValues(alpha: 0.15),
                 child: Icon(
                   Icons.person,
-                  color: _isScrolled ? Colors.white : const Color(0xFF8A6E6A),
+                  color: _isScrolled ? colorScheme.onPrimary : colorScheme.primary,
                   size: 20,
                 ),
               ),
@@ -294,7 +297,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: colorScheme.surface,
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _siswaList.isEmpty
@@ -305,7 +308,7 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF2ECEB),
+                        color: colorScheme.surfaceContainer,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Column(
@@ -327,13 +330,14 @@ class _HomePageState extends State<HomePage> {
                 ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showFormDialog(),
-        backgroundColor: const Color(0xFF8A6E6A),
-        child: const Icon(Icons.add, color: Colors.white),
+        backgroundColor: colorScheme.primary,
+        child: Icon(Icons.add, color: colorScheme.onPrimary),
       ),
     );
   }
 
   Widget _buildSiswaTile(Siswa siswa) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
@@ -344,10 +348,10 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Text(
                   siswa.nama,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF151C3B), // Navy blue
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -355,14 +359,14 @@ class _HomePageState extends State<HomePage> {
                   '${siswa.kelas} • NIS: ${siswa.nis}',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey.shade600,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.edit, color: Color(0xFF8A6E6A)),
+            icon: Icon(Icons.edit, color: colorScheme.primary),
             onPressed: () => _showFormDialog(siswa: siswa),
           ),
           IconButton(

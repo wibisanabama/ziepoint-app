@@ -66,17 +66,19 @@ class _RiwayatCatatanPageState extends State<RiwayatCatatanPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        iconTheme: const IconThemeData(color: Color(0xFF37474F)),
-        title: const Text(
+        iconTheme: IconThemeData(color: colorScheme.onSurfaceVariant),
+        title: Text(
           'Riwayat Catatan',
           style: TextStyle(
-            color: Color(0xFF151C3B),
+            color: colorScheme.onSurface,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
@@ -91,7 +93,7 @@ class _RiwayatCatatanPageState extends State<RiwayatCatatanPage> {
             Container(
               padding: const EdgeInsets.all(20.0),
               decoration: BoxDecoration(
-                color: const Color(0xFF8A6E6A),
+                color: colorScheme.primary,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -118,12 +120,12 @@ class _RiwayatCatatanPageState extends State<RiwayatCatatanPage> {
             ),
             const SizedBox(height: 24),
 
-            const Text(
+            Text(
               'Seluruh Riwayat Aktivitas',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF151C3B),
+                color: colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 16),
@@ -131,7 +133,7 @@ class _RiwayatCatatanPageState extends State<RiwayatCatatanPage> {
             // Segmented (filled) list container for all activities
             Container(
               decoration: BoxDecoration(
-                color: const Color(0xFFF2ECEB),
+                color: colorScheme.surfaceContainer,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -158,6 +160,7 @@ class _RiwayatCatatanPageState extends State<RiwayatCatatanPage> {
 
   Widget _buildActivityTile(Map<String, dynamic> activity) {
     final bool isPositive = activity['isPositive'];
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
@@ -181,10 +184,10 @@ class _RiwayatCatatanPageState extends State<RiwayatCatatanPage> {
               children: [
                 Text(
                   activity['title'],
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
-                    color: Color(0xFF151C3B),
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -192,7 +195,7 @@ class _RiwayatCatatanPageState extends State<RiwayatCatatanPage> {
                   '${activity['category']} • ${activity['date']}',
                   style: TextStyle(
                     fontSize: 11,
-                    color: Colors.grey.shade600,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],

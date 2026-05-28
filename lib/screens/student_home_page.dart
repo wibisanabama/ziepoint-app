@@ -68,17 +68,19 @@ class _StudentHomePageState extends State<StudentHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        iconTheme: const IconThemeData(color: Color(0xFF37474F)),
-        title: const Text(
+        iconTheme: IconThemeData(color: colorScheme.onSurfaceVariant),
+        title: Text(
           'Beranda Siswa',
           style: TextStyle(
-            color: Color(0xFF151C3B),
+            color: colorScheme.onSurface,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
@@ -90,10 +92,10 @@ class _StudentHomePageState extends State<StudentHomePage> {
               onTap: _showLogoutDialog,
               child: CircleAvatar(
                 radius: 18,
-                backgroundColor: const Color(0xFFD3AFAE).withValues(alpha: 0.3),
-                child: const Icon(
+                backgroundColor: colorScheme.primary.withValues(alpha: 0.15),
+                child: Icon(
                   Icons.person,
-                  color: Color(0xFF8A6E6A),
+                  color: colorScheme.primary,
                 ),
               ),
             ),
@@ -109,7 +111,7 @@ class _StudentHomePageState extends State<StudentHomePage> {
             Container(
               padding: const EdgeInsets.all(24.0),
               decoration: BoxDecoration(
-                color: const Color(0xFF8A6E6A),
+                color: colorScheme.primary,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Column(
@@ -187,12 +189,12 @@ class _StudentHomePageState extends State<StudentHomePage> {
             const SizedBox(height: 28),
 
             // Quick Navigation Cards Section
-            const Text(
+            Text(
               'Menu ZiePoint',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF151C3B),
+                color: colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 16),
@@ -247,12 +249,12 @@ class _StudentHomePageState extends State<StudentHomePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Catatan Aktivitas Terbaru',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF151C3B),
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 TextButton(
@@ -264,9 +266,9 @@ class _StudentHomePageState extends State<StudentHomePage> {
                       ),
                     );
                   },
-                  child: const Text(
+                  child: Text(
                     'Lihat Semua',
-                    style: TextStyle(color: Color(0xFF8A6E6A)),
+                    style: TextStyle(color: colorScheme.primary),
                   ),
                 ),
               ],
@@ -276,7 +278,7 @@ class _StudentHomePageState extends State<StudentHomePage> {
             // Segmented (filled) Container for activities
             Container(
               decoration: BoxDecoration(
-                color: const Color(0xFFF2ECEB),
+                color: colorScheme.surfaceContainer,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -307,12 +309,13 @@ class _StudentHomePageState extends State<StudentHomePage> {
     required Color color,
     required VoidCallback onTap,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(20.0),
         decoration: BoxDecoration(
-          color: const Color(0xFFF2ECEB),
+          color: colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -329,10 +332,10 @@ class _StudentHomePageState extends State<StudentHomePage> {
             const SizedBox(height: 16),
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF151C3B),
+                color: colorScheme.onSurface,
                 height: 1.2,
               ),
             ),
@@ -341,7 +344,7 @@ class _StudentHomePageState extends State<StudentHomePage> {
               subtitle,
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.grey.shade500,
+                color: colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -352,6 +355,7 @@ class _StudentHomePageState extends State<StudentHomePage> {
 
   Widget _buildActivityTile(Map<String, dynamic> activity) {
     final bool isPositive = activity['isPositive'];
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
@@ -375,10 +379,10 @@ class _StudentHomePageState extends State<StudentHomePage> {
               children: [
                 Text(
                   activity['title'],
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
-                    color: Color(0xFF151C3B),
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -386,7 +390,7 @@ class _StudentHomePageState extends State<StudentHomePage> {
                   '${activity['category']} • ${activity['date']}',
                   style: TextStyle(
                     fontSize: 11,
-                    color: Colors.grey.shade600,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],

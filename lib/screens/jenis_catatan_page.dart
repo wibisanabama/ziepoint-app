@@ -68,17 +68,19 @@ class _JenisCatatanPageState extends State<JenisCatatanPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA), // Very light blue-grey background
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        iconTheme: const IconThemeData(color: Color(0xFF37474F)), // Dark grey/blue icon
+        iconTheme: IconThemeData(color: colorScheme.onSurfaceVariant),
         title: Text(
           widget.tipe == 'prestasi' ? 'Jenis Prestasi' : 'Jenis Pelanggaran',
-          style: const TextStyle(
-            color: Color(0xFF151C3B), // Dark Navy Blue
+          style: TextStyle(
+            color: colorScheme.onSurface,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
@@ -96,7 +98,7 @@ class _JenisCatatanPageState extends State<JenisCatatanPage> {
                     margin: const EdgeInsets.only(bottom: 24.0),
                     padding: const EdgeInsets.all(20.0),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF2ECEB),
+                      color: colorScheme.surfaceContainer,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
@@ -106,10 +108,10 @@ class _JenisCatatanPageState extends State<JenisCatatanPage> {
                           widget.tipe == 'prestasi' 
                               ? 'Daftar Kriteria\nPrestasi'
                               : 'Daftar Kriteria\nPelanggaran',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF151C3B), // Dark Navy Blue
+                            color: colorScheme.onSurface,
                             height: 1.2,
                           ),
                         ),
@@ -120,7 +122,7 @@ class _JenisCatatanPageState extends State<JenisCatatanPage> {
                               : 'Panduan poin penalti resmi untuk\nkedisiplinan siswa ZiePoint.',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey.shade600,
+                            color: colorScheme.onSurfaceVariant,
                             height: 1.4,
                           ),
                         ),
@@ -134,7 +136,7 @@ class _JenisCatatanPageState extends State<JenisCatatanPage> {
                   else
                     Container(
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF2ECEB),
+                        color: colorScheme.surfaceContainer,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Column(
@@ -159,6 +161,7 @@ class _JenisCatatanPageState extends State<JenisCatatanPage> {
   }
 
   Widget _buildCatatanTile(JenisCatatan catatan) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Column(
@@ -171,10 +174,10 @@ class _JenisCatatanPageState extends State<JenisCatatanPage> {
               Expanded(
                 child: Text(
                   catatan.nama,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF151C3B), // Dark Navy Blue
+                    color: colorScheme.onSurface,
                   ),
                 ),
               ),
@@ -201,7 +204,7 @@ class _JenisCatatanPageState extends State<JenisCatatanPage> {
             catatan.deskripsi,
             style: TextStyle(
               fontSize: 14,
-              color: Colors.grey.shade600,
+              color: colorScheme.onSurfaceVariant,
               height: 1.5,
             ),
           ),
