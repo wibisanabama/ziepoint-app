@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/siswa.dart';
 import '../services/api_service.dart';
-import '../widgets/app_drawer.dart';
+import 'login_page.dart';
 
 class HomePage extends StatefulWidget {
   final String role;
@@ -15,6 +15,34 @@ class _HomePageState extends State<HomePage> {
   final ApiService _apiService = ApiService();
   List<Siswa> _siswaList = [];
   bool _isLoading = true;
+
+  void _showLogoutDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Konfirmasi Keluar"),
+          content: const Text("Apakah Anda yakin ingin keluar dari akun?"),
+          actions: [
+            TextButton(
+              child: const Text("Batal"),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text("Keluar", style: TextStyle(color: Colors.red)),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   void initState() {
@@ -214,8 +242,20 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: const Color(0xFF8A6E6A),
         centerTitle: true,
         elevation: 0,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: GestureDetector(
+              onTap: _showLogoutDialog,
+              child: const CircleAvatar(
+                radius: 16,
+                backgroundColor: Colors.white24,
+                child: Text('👨‍🏫', style: TextStyle(fontSize: 16)),
+              ),
+            ),
+          ),
+        ],
       ),
-      drawer: AppDrawer(role: widget.role),
       backgroundColor: const Color(0xFFF5F5F5),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
