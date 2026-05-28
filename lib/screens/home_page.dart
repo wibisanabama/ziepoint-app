@@ -209,7 +209,7 @@ class _HomePageState extends State<HomePage> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFD3AFAE),
+                    backgroundColor: const Color(0xFF8A6E6A),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
@@ -219,7 +219,11 @@ class _HomePageState extends State<HomePage> {
                   ),
                   child: const Text(
                     'SIMPAN',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      letterSpacing: 0.8,
+                    ),
                   ),
                 ),
               ],
