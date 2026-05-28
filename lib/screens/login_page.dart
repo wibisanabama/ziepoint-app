@@ -231,7 +231,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           )
                         : const Text(
-                            'LOGIN',
+                            'MASUK',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
