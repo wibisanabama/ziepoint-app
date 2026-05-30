@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../models/siswa.dart';
 import '../services/api_service.dart';
-import 'login_page.dart';
 
 class HomePage extends StatefulWidget {
   final String role;
@@ -17,34 +17,6 @@ class _HomePageState extends State<HomePage> {
   bool _isLoading = true;
   final ScrollController _scrollController = ScrollController();
   bool _isScrolled = false;
-
-  void _showLogoutDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Konfirmasi Keluar"),
-          content: const Text("Apakah Anda yakin ingin keluar dari akun?"),
-          actions: [
-            TextButton(
-              child: const Text("Batal"),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            TextButton(
-              child: const Text("Keluar", style: TextStyle(color: Colors.red)),
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                );
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   void initState() {
@@ -84,8 +56,9 @@ class _HomePageState extends State<HomePage> {
       });
     } catch (e) {
       if (!mounted) return;
+      final errorMsg = e.toString().replaceAll('Exception: ', '');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal memuat data: $e')),
+        SnackBar(content: Text('Gagal memuat data: $errorMsg')),
       );
     } finally {
       setState(() {
@@ -94,37 +67,229 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> _deleteSiswa(int id) async {
+  Future<bool?> _confirmDeleteDialog(int id) async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text("Konfirmasi Hapus"),
+          content:
+              const Text("Apakah Anda yakin ingin menghapus data siswa ini?"),
+          actions: [
+            TextButton(
+              child: const Text("Batal"),
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+            ),
+            TextButton(
+              child: const Text("Hapus", style: TextStyle(color: Colors.red)),
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteSiswaSilently(int id) async {
     try {
       await _apiService.deleteSiswa(id);
       _fetchSiswa();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Data berhasil dihapus')),
+        const SnackBar(content: Text('Data siswa berhasil dihapus')),
       );
     } catch (e) {
+      _fetchSiswa();
       if (!mounted) return;
+      final errorMsg = e.toString().replaceAll('Exception: ', '');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal menghapus data: $e')),
+        SnackBar(content: Text('Gagal menghapus data: $errorMsg')),
       );
     }
   }
 
+  void _showDetailBottomSheet(Siswa siswa) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext sheetContext) {
+        final colorScheme = Theme.of(sheetContext).colorScheme;
+
+        return Container(
+          decoration: BoxDecoration(
+            color: colorScheme.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Container(
+                  width: 48,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  CircleAvatar(
+                    backgroundColor:
+                        colorScheme.primary.withValues(alpha: 0.15),
+                    radius: 24,
+                    child: Icon(Icons.person,
+                        color: colorScheme.primary, size: 28),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          siswa.nama,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Kelas ${siswa.kelas}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Divider(color: colorScheme.outlineVariant.withValues(alpha: 0.3)),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'NOMOR INDUK SISWA (NIS)',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.onSurfaceVariant,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          siswa.nis,
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (siswa.password != null && siswa.password!.isNotEmpty)
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'PASSWORD AKSES',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.onSurfaceVariant,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            siswa.password!,
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 36),
+              if (widget.role == 'guru') ...[
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(sheetContext);
+                    _showFormDialog(siswa: siswa);
+                  },
+                  icon: const Icon(Icons.edit_outlined),
+                  label: const Text('EDIT DATA SISWA'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    elevation: 0,
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+              OutlinedButton(
+                onPressed: () => Navigator.pop(sheetContext),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  side: BorderSide(color: colorScheme.outlineVariant),
+                ),
+                child: Text(
+                  'TUTUP',
+                  style: TextStyle(color: colorScheme.onSurfaceVariant),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void _showFormDialog({Siswa? siswa}) {
     final isEditing = siswa != null;
-    final namaController = TextEditingController(text: isEditing ? siswa.nama : '');
-    final kelasController = TextEditingController(text: isEditing ? siswa.kelas : '');
-    final nisController = TextEditingController(text: isEditing ? siswa.nis : '');
-    final passwordController = TextEditingController(text: isEditing ? (siswa.password ?? '') : '');
+    final namaController =
+        TextEditingController(text: isEditing ? siswa.nama : '');
+    final kelasController =
+        TextEditingController(text: isEditing ? siswa.kelas : '');
+    final nisController =
+        TextEditingController(text: isEditing ? siswa.nis : '');
+    final passwordController =
+        TextEditingController(text: isEditing ? (siswa.password ?? '') : '');
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (BuildContext context) {
+      builder: (BuildContext sheetContext) {
         return Padding(
           padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
+            bottom: MediaQuery.of(sheetContext).viewInsets.bottom,
           ),
           child: Container(
             decoration: const BoxDecoration(
@@ -141,7 +306,7 @@ class _HomePageState extends State<HomePage> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
+                    color: Theme.of(sheetContext).colorScheme.primary,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -158,6 +323,7 @@ class _HomePageState extends State<HomePage> {
                 _buildTextField(
                   controller: nisController,
                   label: 'NIS',
+                  keyboardType: TextInputType.number,
                 ),
                 const SizedBox(height: 12),
                 _buildTextField(
@@ -172,7 +338,8 @@ class _HomePageState extends State<HomePage> {
                         kelasController.text.isEmpty ||
                         nisController.text.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Semua kolom harus diisi')),
+                        const SnackBar(
+                            content: Text('Semua kolom harus diisi')),
                       );
                       return;
                     }
@@ -182,7 +349,9 @@ class _HomePageState extends State<HomePage> {
                       nama: namaController.text,
                       kelas: kelasController.text,
                       nis: nisController.text,
-                      password: passwordController.text.isNotEmpty ? passwordController.text : null,
+                      password: passwordController.text.isNotEmpty
+                          ? passwordController.text
+                          : null,
                     );
 
                     try {
@@ -191,26 +360,33 @@ class _HomePageState extends State<HomePage> {
                       } else {
                         await _apiService.createSiswa(newSiswa);
                       }
-                      if (!context.mounted) return;
-                      
+                      if (!mounted) return;
+
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(isEditing ? 'Data berhasil diupdate' : 'Data berhasil ditambah'),
+                          content: Text(isEditing
+                              ? 'Data berhasil diupdate'
+                              : 'Data berhasil ditambah'),
                         ),
                       );
-                      
-                      Navigator.of(context).pop();
+
+                      if (!sheetContext.mounted) return;
+                      Navigator.of(sheetContext).pop();
                       _fetchSiswa();
                     } catch (e) {
-                      if (!context.mounted) return;
+                      if (!mounted) return;
+                      final errorMsg =
+                          e.toString().replaceAll('Exception: ', '');
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Gagal menyimpan data: $e')),
+                        SnackBar(
+                            content: Text('Gagal menyimpan data: $errorMsg')),
                       );
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    backgroundColor: Theme.of(sheetContext).colorScheme.primary,
+                    foregroundColor:
+                        Theme.of(sheetContext).colorScheme.onPrimary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25),
@@ -238,11 +414,16 @@ class _HomePageState extends State<HomePage> {
     required TextEditingController controller,
     required String label,
     bool obscureText = false,
+    TextInputType keyboardType = TextInputType.text,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
     return TextField(
       controller: controller,
       obscureText: obscureText,
+      keyboardType: keyboardType,
+      inputFormatters: keyboardType == TextInputType.number
+          ? [FilteringTextInputFormatter.digitsOnly]
+          : null,
       decoration: InputDecoration(
         labelText: label,
         border: OutlineInputBorder(
@@ -257,7 +438,8 @@ class _HomePageState extends State<HomePage> {
           borderRadius: BorderRadius.circular(8.0),
           borderSide: BorderSide(color: colorScheme.primary),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
     );
   }
@@ -279,23 +461,6 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: _isScrolled ? colorScheme.primary : Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: GestureDetector(
-              onTap: _showLogoutDialog,
-              child: CircleAvatar(
-                radius: 16,
-                backgroundColor: _isScrolled ? colorScheme.onPrimary.withValues(alpha: 0.2) : colorScheme.primary.withValues(alpha: 0.15),
-                child: Icon(
-                  Icons.person,
-                  color: _isScrolled ? colorScheme.onPrimary : colorScheme.primary,
-                  size: 20,
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
       backgroundColor: colorScheme.surface,
       body: _isLoading
@@ -323,7 +488,6 @@ class _HomePageState extends State<HomePage> {
   Widget _buildSiswaTile(Siswa siswa, int index, int total) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    // Determine border radius based on position in the list
     BorderRadius borderRadius;
     if (total == 1) {
       borderRadius = BorderRadius.circular(16);
@@ -335,75 +499,86 @@ class _HomePageState extends State<HomePage> {
       borderRadius = BorderRadius.zero;
     }
 
-    return Container(
-      margin: EdgeInsets.only(bottom: index == total - 1 ? 0 : 2.0),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainer,
-        borderRadius: borderRadius,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    siswa.nama,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.onSurface,
+    Widget tileContent = GestureDetector(
+      onTap: () => _showDetailBottomSheet(siswa),
+      child: Container(
+        margin: EdgeInsets.only(bottom: index == total - 1 ? 0 : 2.0),
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainer,
+          borderRadius: borderRadius,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      siswa.nama,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${siswa.kelas} • NIS: ${siswa.nis}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: colorScheme.onSurfaceVariant,
+                    const SizedBox(height: 4),
+                    Text(
+                      '${siswa.kelas} • NIS: ${siswa.nis}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            IconButton(
-              icon: Icon(Icons.edit, color: colorScheme.primary),
-              onPressed: () => _showFormDialog(siswa: siswa),
-            ),
-            IconButton(
-              icon: const Icon(Icons.delete_outline, color: Colors.red),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text("Konfirmasi"),
-                      content: const Text("Yakin ingin menghapus data ini?"),
-                      actions: [
-                        TextButton(
-                          child: const Text("Batal"),
-                          onPressed: () => Navigator.of(context).pop(),
-                        ),
-                        TextButton(
-                          child: const Text("Hapus", style: TextStyle(color: Colors.red)),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            if (siswa.id != null) {
-                              _deleteSiswa(siswa.id!);
-                            }
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
+
+    if (widget.role == 'guru') {
+      return Dismissible(
+        key: ValueKey(siswa.id ?? siswa.nis),
+        direction: DismissDirection.horizontal,
+        background: Container(
+          alignment: Alignment.centerLeft,
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          decoration: BoxDecoration(
+            color: Colors.redAccent,
+            borderRadius: borderRadius,
+          ),
+          child:
+              const Icon(Icons.delete_outline, color: Colors.white, size: 28),
+        ),
+        secondaryBackground: Container(
+          alignment: Alignment.centerRight,
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          decoration: BoxDecoration(
+            color: Colors.redAccent,
+            borderRadius: borderRadius,
+          ),
+          child:
+              const Icon(Icons.delete_outline, color: Colors.white, size: 28),
+        ),
+        confirmDismiss: (direction) async {
+          if (siswa.id != null) {
+            return await _confirmDeleteDialog(siswa.id!);
+          }
+          return false;
+        },
+        onDismissed: (direction) {
+          if (siswa.id != null) {
+            _deleteSiswaSilently(siswa.id!);
+          }
+        },
+        child: tileContent,
+      );
+    } else {
+      return tileContent;
+    }
   }
 }
