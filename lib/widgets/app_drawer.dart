@@ -36,10 +36,11 @@ class AppDrawer extends StatelessWidget {
                     leading: const Icon(Icons.people),
                     title: const Text('Data Siswa'),
                     onTap: () {
-                      Navigator.pop(context); // Close the drawer
+                      Navigator.pop(context);
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => HomePage(role: role)),
+                        MaterialPageRoute(
+                            builder: (context) => HomePage(role: role)),
                       );
                     },
                   ),
@@ -48,11 +49,13 @@ class AppDrawer extends StatelessWidget {
                     leading: const Icon(Icons.home),
                     title: const Text('Beranda'),
                     onTap: () {
-                      Navigator.pop(context); // Close the drawer
+                      Navigator.pop(context);
                       if (siswa != null) {
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => StudentHomePage(siswa: siswa!)),
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  StudentHomePage(siswa: siswa!)),
                         );
                       }
                     },
@@ -61,10 +64,12 @@ class AppDrawer extends StatelessWidget {
                     leading: const Icon(Icons.warning_amber_rounded),
                     title: const Text('Jenis Pelanggaran'),
                     onTap: () {
-                      Navigator.pop(context); // Close the drawer
+                      Navigator.pop(context);
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => JenisCatatanPage(tipe: 'pelanggaran', role: role, siswa: siswa)),
+                        MaterialPageRoute(
+                            builder: (context) => JenisCatatanPage(
+                                tipe: 'pelanggaran', role: role, siswa: siswa)),
                       );
                     },
                   ),
@@ -72,10 +77,12 @@ class AppDrawer extends StatelessWidget {
                     leading: const Icon(Icons.emoji_events),
                     title: const Text('Jenis Prestasi'),
                     onTap: () {
-                      Navigator.pop(context); // Close the drawer
+                      Navigator.pop(context);
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => JenisCatatanPage(tipe: 'prestasi', role: role, siswa: siswa)),
+                        MaterialPageRoute(
+                            builder: (context) => JenisCatatanPage(
+                                tipe: 'prestasi', role: role, siswa: siswa)),
                       );
                     },
                   ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/siswa.dart';
+import '../services/api_service.dart';
 
 class RiwayatCatatanPage extends StatefulWidget {
   final Siswa siswa;
@@ -10,59 +11,40 @@ class RiwayatCatatanPage extends StatefulWidget {
 }
 
 class _RiwayatCatatanPageState extends State<RiwayatCatatanPage> {
-  // Full list of activities for student history
-  final List<Map<String, dynamic>> _allActivities = [
-    {
-      'title': 'Mengikuti Lomba Kebersihan Kelas',
-      'category': 'Prestasi',
-      'points': '+15 Poin',
-      'date': '27 Mei 2026',
-      'isPositive': true,
-    },
-    {
-      'title': 'Terlambat Masuk Sekolah (10 Menit)',
-      'category': 'Pelanggaran',
-      'points': '-10 Poin',
-      'date': '25 Mei 2026',
-      'isPositive': false,
-    },
-    {
-      'title': 'Juara 1 Lomba Pidato Bahasa Inggris',
-      'category': 'Prestasi',
-      'points': '+50 Poin',
-      'date': '18 Mei 2026',
-      'isPositive': true,
-    },
-    {
-      'title': 'Atribut Seragam Tidak Lengkap',
-      'category': 'Pelanggaran',
-      'points': '-15 Poin',
-      'date': '12 Mei 2026',
-      'isPositive': false,
-    },
-    {
-      'title': 'Menjadi Petugas Upacara Bendera',
-      'category': 'Prestasi',
-      'points': '+20 Poin',
-      'date': '10 Mei 2026',
-      'isPositive': true,
-    },
-    {
-      'title': 'Membuang Sampah Sembarangan',
-      'category': 'Pelanggaran',
-      'points': '-10 Poin',
-      'date': '05 Mei 2026',
-      'isPositive': false,
-    },
-    {
-      'title': 'Membantu Rapihkan Buku Perpustakaan',
-      'category': 'Prestasi',
-      'points': '+10 Poin',
-      'date': '02 Mei 2026',
-      'isPositive': true,
-    },
-  ];
+  final ApiService _apiService = ApiService();
+  List<Map<String, dynamic>> _allActivities = [];
+  bool _isLoading = true;
 
+  @override
+  void initState() {
+    super.initState();
+    _fetchHistory();
+  }
+
+  Future<void> _fetchHistory() async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      if (widget.siswa.id != null) {
+        final data = await _apiService.fetchCatatanSiswa(widget.siswa.id!);
+        setState(() {
+          _allActivities = data;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        final errorMsg = e.toString().replaceAll('Exception: ', '');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal memuat riwayat: $errorMsg')),
+        );
+      }
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,72 +66,81 @@ class _RiwayatCatatanPageState extends State<RiwayatCatatanPage> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Header Info Card (Filled, no shadow)
-            Container(
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
               padding: const EdgeInsets.all(20.0),
-              decoration: BoxDecoration(
-                color: colorScheme.primary,
-                borderRadius: BorderRadius.circular(16),
-              ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  Container(
+                    padding: const EdgeInsets.all(20.0),
+                    decoration: BoxDecoration(
+                      color: colorScheme.primary,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.siswa.nama,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Kelas: ${widget.siswa.kelas} • NIS: ${widget.siswa.nis}',
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
                   Text(
-                    widget.siswa.nama,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
+                    'Seluruh Riwayat Aktivitas',
+                    style: TextStyle(
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Kelas: ${widget.siswa.kelas} • NIS: ${widget.siswa.nis}',
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 13,
+                  const SizedBox(height: 16),
+                  if (_allActivities.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 40.0),
+                      child: Center(
+                        child: Text(
+                          'Belum ada catatan aktivitas siswa.',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
+                    )
+                  else
+                    Column(
+                      children: [
+                        for (int i = 0; i < _allActivities.length; i++)
+                          _buildActivityTile(
+                              _allActivities[i], i, _allActivities.length),
+                      ],
                     ),
-                  ),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
-
-            Text(
-              'Seluruh Riwayat Aktivitas',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Segmented (filled) list container for all activities
-            // Stack of segmented (filled) items with custom border radius per item
-            Column(
-              children: [
-                for (int i = 0; i < _allActivities.length; i++)
-                  _buildActivityTile(_allActivities[i], i, _allActivities.length),
-              ],
-            ),
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
     );
   }
 
-  Widget _buildActivityTile(Map<String, dynamic> activity, int index, int total) {
+  Widget _buildActivityTile(
+      Map<String, dynamic> activity, int index, int total) {
     final bool isPositive = activity['isPositive'];
     final colorScheme = Theme.of(context).colorScheme;
 
-    // Determine border radius based on position in the list
     BorderRadius borderRadius;
     if (total == 1) {
       borderRadius = BorderRadius.circular(16);
@@ -174,12 +165,19 @@ class _RiwayatCatatanPageState extends State<RiwayatCatatanPage> {
             Container(
               padding: const EdgeInsets.all(8.0),
               decoration: BoxDecoration(
-                color: (isPositive ? const Color(0xFF43A047) : const Color(0xFFB71C1C)).withValues(alpha: 0.1),
+                color: (isPositive
+                        ? const Color(0xFF43A047)
+                        : const Color(0xFFB71C1C))
+                    .withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
-                isPositive ? Icons.add_circle_outline : Icons.remove_circle_outline,
-                color: isPositive ? const Color(0xFF43A047) : const Color(0xFFB71C1C),
+                isPositive
+                    ? Icons.add_circle_outline
+                    : Icons.remove_circle_outline,
+                color: isPositive
+                    ? const Color(0xFF43A047)
+                    : const Color(0xFFB71C1C),
                 size: 20,
               ),
             ),
@@ -213,7 +211,9 @@ class _RiwayatCatatanPageState extends State<RiwayatCatatanPage> {
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
-                color: isPositive ? const Color(0xFF43A047) : const Color(0xFFB71C1C),
+                color: isPositive
+                    ? const Color(0xFF43A047)
+                    : const Color(0xFFB71C1C),
               ),
             ),
           ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/siswa.dart';
+import '../services/api_service.dart';
 import 'jenis_catatan_page.dart';
 import 'login_page.dart';
 import 'riwayat_catatan_page.dart';
@@ -13,30 +14,40 @@ class StudentHomePage extends StatefulWidget {
 }
 
 class _StudentHomePageState extends State<StudentHomePage> {
-  // Mock point history for premium dashboard look
-  final List<Map<String, dynamic>> _recentActivities = [
-    {
-      'title': 'Mengikuti Lomba Kebersihan Kelas',
-      'category': 'Prestasi',
-      'points': '+15 Poin',
-      'date': '27 Mei 2026',
-      'isPositive': true,
-    },
-    {
-      'title': 'Terlambat Masuk Sekolah (10 Menit)',
-      'category': 'Pelanggaran',
-      'points': '-10 Poin',
-      'date': '25 Mei 2026',
-      'isPositive': false,
-    },
-    {
-      'title': 'Juara 1 Lomba Pidato Bahasa Inggris',
-      'category': 'Prestasi',
-      'points': '+50 Poin',
-      'date': '18 Mei 2026',
-      'isPositive': true,
-    },
-  ];
+  final ApiService _apiService = ApiService();
+  List<Map<String, dynamic>> _recentActivities = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchRecentActivities();
+  }
+
+  Future<void> _fetchRecentActivities() async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      if (widget.siswa.id != null) {
+        final data = await _apiService.fetchCatatanSiswa(widget.siswa.id!);
+        setState(() {
+          _recentActivities = data.take(3).toList();
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        final errorMsg = e.toString().replaceAll('Exception: ', '');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal memuat aktivitas: $errorMsg')),
+        );
+      }
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   void _showLogoutDialog() {
     showDialog(
@@ -107,7 +118,6 @@ class _StudentHomePageState extends State<StudentHomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Student Welcome Card
             Container(
               padding: const EdgeInsets.all(24.0),
               decoration: BoxDecoration(
@@ -142,7 +152,8 @@ class _StudentHomePageState extends State<StudentHomePage> {
                         ],
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(30),
@@ -187,8 +198,6 @@ class _StudentHomePageState extends State<StudentHomePage> {
               ),
             ),
             const SizedBox(height: 28),
-
-            // Quick Navigation Cards Section
             Text(
               'Menu ZiePoint',
               style: TextStyle(
@@ -244,8 +253,6 @@ class _StudentHomePageState extends State<StudentHomePage> {
               ],
             ),
             const SizedBox(height: 28),
-
-            // Activity History Section
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -262,7 +269,8 @@ class _StudentHomePageState extends State<StudentHomePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => RiwayatCatatanPage(siswa: widget.siswa),
+                        builder: (context) =>
+                            RiwayatCatatanPage(siswa: widget.siswa),
                       ),
                     );
                   },
@@ -274,15 +282,29 @@ class _StudentHomePageState extends State<StudentHomePage> {
               ],
             ),
             const SizedBox(height: 8),
-
-            // Segmented (filled) Container for activities
-            // Stack of segmented (filled) items with custom border radius per item
-            Column(
-              children: [
-                for (int i = 0; i < _recentActivities.length; i++)
-                  _buildActivityTile(_recentActivities[i], i, _recentActivities.length),
-              ],
-            ),
+            if (_isLoading)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 24.0),
+                child: Center(child: CircularProgressIndicator()),
+              )
+            else if (_recentActivities.isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 24.0),
+                child: Center(
+                  child: Text(
+                    'Belum ada catatan aktivitas.',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
+              )
+            else
+              Column(
+                children: [
+                  for (int i = 0; i < _recentActivities.length; i++)
+                    _buildActivityTile(
+                        _recentActivities[i], i, _recentActivities.length),
+                ],
+              ),
           ],
         ),
       ),
@@ -340,11 +362,11 @@ class _StudentHomePageState extends State<StudentHomePage> {
     );
   }
 
-  Widget _buildActivityTile(Map<String, dynamic> activity, int index, int total) {
+  Widget _buildActivityTile(
+      Map<String, dynamic> activity, int index, int total) {
     final bool isPositive = activity['isPositive'];
     final colorScheme = Theme.of(context).colorScheme;
 
-    // Determine border radius based on position in the list
     BorderRadius borderRadius;
     if (total == 1) {
       borderRadius = BorderRadius.circular(16);
@@ -369,12 +391,19 @@ class _StudentHomePageState extends State<StudentHomePage> {
             Container(
               padding: const EdgeInsets.all(8.0),
               decoration: BoxDecoration(
-                color: (isPositive ? const Color(0xFF43A047) : const Color(0xFFB71C1C)).withValues(alpha: 0.1),
+                color: (isPositive
+                        ? const Color(0xFF43A047)
+                        : const Color(0xFFB71C1C))
+                    .withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
-                isPositive ? Icons.add_circle_outline : Icons.remove_circle_outline,
-                color: isPositive ? const Color(0xFF43A047) : const Color(0xFFB71C1C),
+                isPositive
+                    ? Icons.add_circle_outline
+                    : Icons.remove_circle_outline,
+                color: isPositive
+                    ? const Color(0xFF43A047)
+                    : const Color(0xFFB71C1C),
                 size: 20,
               ),
             ),
@@ -408,7 +437,9 @@ class _StudentHomePageState extends State<StudentHomePage> {
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
-                color: isPositive ? const Color(0xFF43A047) : const Color(0xFFB71C1C),
+                color: isPositive
+                    ? const Color(0xFF43A047)
+                    : const Color(0xFFB71C1C),
               ),
             ),
           ],

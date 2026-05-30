@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
-import 'home_page.dart';
 import 'student_home_page.dart';
+import 'teacher_home_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,15 +16,17 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   bool _isLoading = false;
   bool _obscurePassword = true;
-  bool _isSiswa = true; // true = Siswa, false = Guru
+  bool _isSiswa = true;
 
   Future<void> _handleLogin() async {
-    final identifier = _nisController.text.trim(); // used for both NIS or NIP
+    final identifier = _nisController.text.trim();
     final password = _passwordController.text;
 
     if (identifier.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${_isSiswa ? "NIS" : "NIP"} dan Password harus diisi')),
+        SnackBar(
+            content:
+                Text('${_isSiswa ? "NIS" : "NIP"} dan Password harus diisi')),
       );
       return;
     }
@@ -39,22 +41,27 @@ class _LoginPageState extends State<LoginPage> {
         if (!mounted) return;
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => StudentHomePage(siswa: siswa)),
+          MaterialPageRoute(
+              builder: (context) => StudentHomePage(siswa: siswa)),
         );
       } else {
-        await _apiService.loginGuru(identifier, password);
+        final guru = await _apiService.loginGuru(identifier, password);
         if (!mounted) return;
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const HomePage(role: 'guru')),
+          MaterialPageRoute(builder: (context) => TeacherHomePage(guru: guru)),
         );
       }
     } catch (e) {
       if (!mounted) return;
       String message = '${_isSiswa ? "NIS" : "NIP"} atau Password salah';
       final errStr = e.toString();
-      if (errStr.contains('SocketException') || errStr.contains('Connection refused') || errStr.contains('ClientException') || errStr.contains('HttpException')) {
-        message = 'Gagal menghubungkan ke server. Pastikan backend aktif dan port-forwarding sudah berjalan!';
+      if (errStr.contains('SocketException') ||
+          errStr.contains('Connection refused') ||
+          errStr.contains('ClientException') ||
+          errStr.contains('HttpException')) {
+        message =
+            'Gagal menghubungkan ke server. Pastikan backend aktif dan port-forwarding sudah berjalan!';
       } else if (errStr.contains('Exception:')) {
         message = errStr.replaceAll('Exception: ', '');
       }
@@ -117,17 +124,23 @@ class _LoginPageState extends State<LoginPage> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
-                            color: _isSiswa ? colorScheme.primary : Colors.transparent,
+                            color: _isSiswa
+                                ? colorScheme.primary
+                                : Colors.transparent,
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: _isSiswa ? colorScheme.primary : colorScheme.outlineVariant,
+                              color: _isSiswa
+                                  ? colorScheme.primary
+                                  : colorScheme.outlineVariant,
                             ),
                           ),
                           child: Center(
                             child: Text(
                               'Siswa',
                               style: TextStyle(
-                                color: _isSiswa ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
+                                color: _isSiswa
+                                    ? colorScheme.onPrimary
+                                    : colorScheme.onSurfaceVariant,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -142,17 +155,23 @@ class _LoginPageState extends State<LoginPage> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
-                            color: !_isSiswa ? colorScheme.primary : Colors.transparent,
+                            color: !_isSiswa
+                                ? colorScheme.primary
+                                : Colors.transparent,
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: !_isSiswa ? colorScheme.primary : colorScheme.outlineVariant,
+                              color: !_isSiswa
+                                  ? colorScheme.primary
+                                  : colorScheme.outlineVariant,
                             ),
                           ),
                           child: Center(
                             child: Text(
                               'Guru',
                               style: TextStyle(
-                                color: !_isSiswa ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
+                                color: !_isSiswa
+                                    ? colorScheme.onPrimary
+                                    : colorScheme.onSurfaceVariant,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -185,7 +204,9 @@ class _LoginPageState extends State<LoginPage> {
                       padding: const EdgeInsets.only(right: 8.0),
                       child: IconButton(
                         icon: Icon(
-                          _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                         ),
                         onPressed: () {
                           setState(() {
