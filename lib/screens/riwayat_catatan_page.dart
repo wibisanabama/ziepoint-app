@@ -131,25 +131,12 @@ class _RiwayatCatatanPageState extends State<RiwayatCatatanPage> {
             const SizedBox(height: 16),
 
             // Segmented (filled) list container for all activities
-            Container(
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainer,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                children: [
-                  for (int i = 0; i < _allActivities.length; i++) ...[
-                    _buildActivityTile(_allActivities[i]),
-                    if (i < _allActivities.length - 1)
-                      const Divider(
-                        color: Colors.white30,
-                        height: 1,
-                        indent: 16,
-                        endIndent: 16,
-                      ),
-                  ],
-                ],
-              ),
+            // Stack of segmented (filled) items with custom border radius per item
+            Column(
+              children: [
+                for (int i = 0; i < _allActivities.length; i++)
+                  _buildActivityTile(_allActivities[i], i, _allActivities.length),
+              ],
             ),
             const SizedBox(height: 20),
           ],
@@ -158,59 +145,79 @@ class _RiwayatCatatanPageState extends State<RiwayatCatatanPage> {
     );
   }
 
-  Widget _buildActivityTile(Map<String, dynamic> activity) {
+  Widget _buildActivityTile(Map<String, dynamic> activity, int index, int total) {
     final bool isPositive = activity['isPositive'];
     final colorScheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              color: (isPositive ? const Color(0xFF43A047) : const Color(0xFFB71C1C)).withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+
+    // Determine border radius based on position in the list
+    BorderRadius borderRadius;
+    if (total == 1) {
+      borderRadius = BorderRadius.circular(16);
+    } else if (index == 0) {
+      borderRadius = const BorderRadius.vertical(top: Radius.circular(16));
+    } else if (index == total - 1) {
+      borderRadius = const BorderRadius.vertical(bottom: Radius.circular(16));
+    } else {
+      borderRadius = BorderRadius.zero;
+    }
+
+    return Container(
+      margin: EdgeInsets.only(bottom: index == total - 1 ? 0 : 2.0),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainer,
+        borderRadius: borderRadius,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                color: (isPositive ? const Color(0xFF43A047) : const Color(0xFFB71C1C)).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                isPositive ? Icons.add_circle_outline : Icons.remove_circle_outline,
+                color: isPositive ? const Color(0xFF43A047) : const Color(0xFFB71C1C),
+                size: 20,
+              ),
             ),
-            child: Icon(
-              isPositive ? Icons.add_circle_outline : Icons.remove_circle_outline,
-              color: isPositive ? const Color(0xFF43A047) : const Color(0xFFB71C1C),
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  activity['title'],
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: colorScheme.onSurface,
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    activity['title'],
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: colorScheme.onSurface,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${activity['category']} • ${activity['date']}',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: colorScheme.onSurfaceVariant,
+                  const SizedBox(height: 4),
+                  Text(
+                    '${activity['category']} • ${activity['date']}',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            activity['points'],
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-              color: isPositive ? const Color(0xFF43A047) : const Color(0xFFB71C1C),
+            const SizedBox(width: 8),
+            Text(
+              activity['points'],
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                color: isPositive ? const Color(0xFF43A047) : const Color(0xFFB71C1C),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

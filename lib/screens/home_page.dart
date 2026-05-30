@@ -306,26 +306,8 @@ class _HomePageState extends State<HomePage> {
                   controller: _scrollController,
                   padding: const EdgeInsets.all(16.0),
                   children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: colorScheme.surfaceContainer,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Column(
-                        children: [
-                          for (int i = 0; i < _siswaList.length; i++) ...[
-                            _buildSiswaTile(_siswaList[i]),
-                            if (i < _siswaList.length - 1)
-                              const Divider(
-                                color: Colors.white30,
-                                height: 1,
-                                indent: 16,
-                                endIndent: 16,
-                              ),
-                          ],
-                        ],
-                      ),
-                    ),
+                    for (int i = 0; i < _siswaList.length; i++)
+                      _buildSiswaTile(_siswaList[i], i, _siswaList.length),
                   ],
                 ),
       floatingActionButton: FloatingActionButton(
@@ -338,69 +320,89 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildSiswaTile(Siswa siswa) {
+  Widget _buildSiswaTile(Siswa siswa, int index, int total) {
     final colorScheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  siswa.nama,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onSurface,
+
+    // Determine border radius based on position in the list
+    BorderRadius borderRadius;
+    if (total == 1) {
+      borderRadius = BorderRadius.circular(16);
+    } else if (index == 0) {
+      borderRadius = const BorderRadius.vertical(top: Radius.circular(16));
+    } else if (index == total - 1) {
+      borderRadius = const BorderRadius.vertical(bottom: Radius.circular(16));
+    } else {
+      borderRadius = BorderRadius.zero;
+    }
+
+    return Container(
+      margin: EdgeInsets.only(bottom: index == total - 1 ? 0 : 2.0),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainer,
+        borderRadius: borderRadius,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    siswa.nama,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${siswa.kelas} • NIS: ${siswa.nis}',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: colorScheme.onSurfaceVariant,
+                  const SizedBox(height: 4),
+                  Text(
+                    '${siswa.kelas} • NIS: ${siswa.nis}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          IconButton(
-            icon: Icon(Icons.edit, color: colorScheme.primary),
-            onPressed: () => _showFormDialog(siswa: siswa),
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete_outline, color: Colors.red),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text("Konfirmasi"),
-                    content: const Text("Yakin ingin menghapus data ini?"),
-                    actions: [
-                      TextButton(
-                        child: const Text("Batal"),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                      TextButton(
-                        child: const Text("Hapus", style: TextStyle(color: Colors.red)),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          if (siswa.id != null) {
-                            _deleteSiswa(siswa.id!);
-                          }
-                        },
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
-          ),
-        ],
+            IconButton(
+              icon: Icon(Icons.edit, color: colorScheme.primary),
+              onPressed: () => _showFormDialog(siswa: siswa),
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete_outline, color: Colors.red),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text("Konfirmasi"),
+                      content: const Text("Yakin ingin menghapus data ini?"),
+                      actions: [
+                        TextButton(
+                          child: const Text("Batal"),
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                        TextButton(
+                          child: const Text("Hapus", style: TextStyle(color: Colors.red)),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            if (siswa.id != null) {
+                              _deleteSiswa(siswa.id!);
+                            }
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

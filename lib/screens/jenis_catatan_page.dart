@@ -130,29 +130,15 @@ class _JenisCatatanPageState extends State<JenisCatatanPage> {
                     ),
                   ),
                   
-                  // List of items (Segmented filled container with no shadow and no outer border)
+                  // List of items (Segmented filled containers with position-based border radii)
                   if (_catatanList.isEmpty)
                     Center(child: Text('Tidak ada data jenis ${widget.tipe}'))
                   else
-                    Container(
-                      decoration: BoxDecoration(
-                        color: colorScheme.surfaceContainer,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Column(
-                        children: [
-                          for (int i = 0; i < _catatanList.length; i++) ...[
-                            _buildCatatanTile(_catatanList[i]),
-                            if (i < _catatanList.length - 1)
-                              const Divider(
-                                color: Colors.white30,
-                                height: 1,
-                                indent: 20,
-                                endIndent: 20,
-                              ),
-                          ],
-                        ],
-                      ),
+                    Column(
+                      children: [
+                        for (int i = 0; i < _catatanList.length; i++)
+                          _buildCatatanTile(_catatanList[i], i, _catatanList.length),
+                      ],
                     ),
                 ],
               ),
@@ -160,55 +146,75 @@ class _JenisCatatanPageState extends State<JenisCatatanPage> {
     );
   }
 
-  Widget _buildCatatanTile(JenisCatatan catatan) {
+  Widget _buildCatatanTile(JenisCatatan catatan, int index, int total) {
     final colorScheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Text(
-                  catatan.nama,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onSurface,
+
+    // Determine border radius based on position in the list
+    BorderRadius borderRadius;
+    if (total == 1) {
+      borderRadius = BorderRadius.circular(16);
+    } else if (index == 0) {
+      borderRadius = const BorderRadius.vertical(top: Radius.circular(16));
+    } else if (index == total - 1) {
+      borderRadius = const BorderRadius.vertical(bottom: Radius.circular(16));
+    } else {
+      borderRadius = BorderRadius.zero;
+    }
+
+    return Container(
+      margin: EdgeInsets.only(bottom: index == total - 1 ? 0 : 2.0),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainer,
+        borderRadius: borderRadius,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    catatan.nama,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: _getBadgeColor(catatan.poin),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  _getBadgeText(catatan.poin),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
+                const SizedBox(width: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: _getBadgeColor(catatan.poin),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    _getBadgeText(catatan.poin),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            catatan.deskripsi,
-            style: TextStyle(
-              fontSize: 14,
-              color: colorScheme.onSurfaceVariant,
-              height: 1.5,
+              ],
             ),
-          ),
-        ],
+            const SizedBox(height: 12),
+            Text(
+              catatan.deskripsi,
+              style: TextStyle(
+                fontSize: 14,
+                color: colorScheme.onSurfaceVariant,
+                height: 1.5,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
