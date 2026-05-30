@@ -5,9 +5,6 @@ import '../models/guru.dart';
 import '../models/jenis_catatan.dart';
 
 class ApiService {
-  // Ganti dengan alamat IP backend Anda jika dijalankan di perangkat fisik
-  // Jika menggunakan emulator Android, gunakan 10.0.2.2
-  // Jika menggunakan emulator iOS atau web, localhost sudah cukup
   static const String baseUrl = 'http://localhost:3000';
 
   Future<List<Siswa>> fetchSiswa() async {
@@ -62,6 +59,16 @@ class ApiService {
     }
   }
 
+  String _parseError(http.Response response, String defaultMsg) {
+    try {
+      final body = jsonDecode(response.body);
+      if (body is Map && body.containsKey('error')) {
+        return body['error'].toString();
+      }
+    } catch (_) {}
+    return defaultMsg;
+  }
+
   Future<Siswa> createSiswa(Siswa siswa) async {
     final response = await http.post(
       Uri.parse('$baseUrl/siswa'),
@@ -71,7 +78,6 @@ class ApiService {
       body: jsonEncode(siswa.toJson()),
     );
     if (response.statusCode == 200) {
-      // API mengembalikan message dan id
       return Siswa(
         id: jsonDecode(response.body)['id'],
         nama: siswa.nama,
@@ -79,7 +85,7 @@ class ApiService {
         nis: siswa.nis,
       );
     } else {
-      throw Exception('Gagal menambahkan siswa');
+      throw Exception(_parseError(response, 'Gagal menambahkan siswa'));
     }
   }
 
@@ -92,7 +98,7 @@ class ApiService {
       body: jsonEncode(siswa.toJson()),
     );
     if (response.statusCode != 200) {
-      throw Exception('Gagal mengupdate siswa. Status: ${response.statusCode}, Error: ${response.body}');
+      throw Exception(_parseError(response, 'Gagal mengupdate siswa'));
     }
   }
 
@@ -104,7 +110,125 @@ class ApiService {
       },
     );
     if (response.statusCode != 200) {
-      throw Exception('Gagal menghapus siswa');
+      throw Exception(_parseError(response, 'Gagal menghapus siswa'));
+    }
+  }
+
+  Future<JenisCatatan> createJenisCatatan(JenisCatatan jenis) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/jenis_catatan'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(jenis.toJson()),
+    );
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return JenisCatatan(
+        idJenis: data['id'],
+        nama: jenis.nama,
+        deskripsi: jenis.deskripsi,
+        tipe: jenis.tipe,
+        poin: jenis.poin,
+      );
+    } else {
+      throw Exception(_parseError(response, 'Gagal menambahkan kriteria'));
+    }
+  }
+
+  Future<void> updateJenisCatatan(JenisCatatan jenis) async {
+    final response = await http.put(
+      Uri.parse('$baseUrl/jenis_catatan/${jenis.idJenis}'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(jenis.toJson()),
+    );
+    if (response.statusCode != 200) {
+      throw Exception(_parseError(response, 'Gagal mengupdate kriteria'));
+    }
+  }
+
+  Future<void> deleteJenisCatatan(int id) async {
+    final response = await http.delete(
+      Uri.parse('$baseUrl/jenis_catatan/$id'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+    if (response.statusCode != 200) {
+      throw Exception(_parseError(response, 'Gagal menghapus kriteria'));
+    }
+  }
+
+  Future<void> createCatatan({
+    int? idGuru,
+    required int idSiswa,
+    required int idJenis,
+    String? tanggal,
+    String? keterangan,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/catatan'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode({
+        'id_guru': idGuru,
+        'id_siswa': idSiswa,
+        'id_jenis': idJenis,
+        'tanggal': tanggal,
+        'keterangan': keterangan,
+      }),
+    );
+    if (response.statusCode != 200) {
+      throw Exception(_parseError(response, 'Gagal menyimpan catatan'));
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> fetchCatatanSiswa(int idSiswa) async {
+    final response =
+        await http.get(Uri.parse('$baseUrl/catatan/siswa/$idSiswa'));
+    if (response.statusCode == 200) {
+      List<dynamic> body = jsonDecode(response.body);
+      return body.map((dynamic item) {
+        final Map<String, dynamic> row = item as Map<String, dynamic>;
+        final String tipe = row['kriteria_tipe']?.toString() ?? 'pelanggaran';
+        final int poin = row['kriteria_poin'] ?? 0;
+        final bool isPositive = tipe.toLowerCase() == 'prestasi';
+
+        String displayDate = row['tanggal']?.toString() ?? '';
+        try {
+          final parsedDate = DateTime.parse(displayDate).toLocal();
+          final months = [
+            'Januari',
+            'Februari',
+            'Maret',
+            'April',
+            'Mei',
+            'Juni',
+            'Juli',
+            'Agustus',
+            'September',
+            'Oktober',
+            'November',
+            'Desember'
+          ];
+          displayDate =
+              '${parsedDate.day} ${months[parsedDate.month - 1]} ${parsedDate.year}';
+        } catch (_) {}
+
+        return {
+          'title': row['kriteria_nama']?.toString() ?? '',
+          'category': isPositive ? 'Prestasi' : 'Pelanggaran',
+          'points': isPositive ? '+$poin Poin' : '-$poin Poin',
+          'date': displayDate,
+          'isPositive': isPositive,
+          'keterangan': row['keterangan']?.toString() ?? '',
+        };
+      }).toList();
+    } else {
+      throw Exception(_parseError(response, 'Gagal memuat riwayat catatan'));
     }
   }
 }
