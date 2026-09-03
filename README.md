@@ -1,126 +1,100 @@
-# ZiePoint Infraction & Achievement Tracker
+# ZiePoint
 
-ZiePoint is an enterprise-grade school management system designed to track student behavior, infractions, and positive achievements. The system is built using a decoupled architecture comprising a cross-platform Flutter client, a hardened Node.js Express REST API, and a relational MySQL database.
+Aplikasi Android dan iOS untuk mencatat pelanggaran dan prestasi siswa, dengan backend REST API berbasis Node.js dan MySQL.
 
----
+## Fitur
 
-## 1. System Architecture
+- Login siswa menggunakan NIS dan login guru menggunakan NIP.
+- Pengelolaan data siswa oleh guru.
+- Pengelolaan kriteria pelanggaran dan prestasi beserta poinnya.
+- Pencatatan pelanggaran dan prestasi siswa.
+- Tampilan aktivitas terbaru dan riwayat catatan siswa.
 
-The project is structured into three primary architectural layers:
+## Struktur Project
 
-```
-+------------------------------------------+
-|             Flutter Client               |
-|  (Teacher/Student Dynamic Dashboards)    |
-+------------------------------------------+
-                     |
-            HTTPS (Port 3000)
-                     v
-+------------------------------------------+
-|            Node.js REST API              |
-|   (Express, prepared statement wrapper)  |
-+------------------------------------------+
-                     |
-             SQL Injection Safe
-                     v
-+------------------------------------------+
-|              MySQL Database              |
-|        (db_sekolah Relational DB)        |
-+------------------------------------------+
+```text
+api-siswa-node/  Backend Express dan koneksi MySQL
+ziepoint-app/    Aplikasi Flutter untuk Android dan iOS
+README.md       Dokumentasi project
 ```
 
-### 1.1. Client Subsystem (Flutter Mobile Application)
-* **Design System**: Implements modern Google Material 3 UI design tokens. The layouts utilize segmented container cards with contextual border radii, swipe-to-dismiss gestures for data operations, and interactive bottom sheets for forms and details.
-* **Role-Based Workflows**: Dynamically redirects users after authentication:
-  * **Siswa Dashboard**: Real-time visualization of current point balances, quick-access menu systems, and a scrollable list of recorded infractions/achievements.
-  * **Guru Dashboard**: Management of the student catalog, criteria administration, and an interface to log new student points.
+## Prasyarat
 
-### 1.2. Backend API Subsystem (Node.js Express Server)
-* **Database Access**: Fully prepared statement executions to defend against SQL Injection vulnerabilities (CWE-89). Direct calls are wrapped in a decoupled dynamic driver redirect layer to break AST-based static analysis matching.
-* **Log Injection Defense**: Implements CRLF (\r\n) sanitization (CWE-117) on incoming logs, and excludes sensitive raw request payloads (such as plain-text passwords) from console logs.
-* **CORS Constraints**: Strict origin validation rules configured to restrict domain access to local development hosts and customized environment variable configurations.
+- Flutter SDK dengan Dart yang kompatibel dengan dependency project.
+- Node.js 18 atau lebih baru dan npm.
+- MySQL.
+- Android SDK untuk Android.
+- macOS dan Xcode untuk pengembangan iOS.
 
-### 1.3. Persistence Subsystem (MySQL Relational Database)
-Consists of four primary entity tables configured inside the `db_sekolah` schema:
-* `siswa`: Manages student attributes including `id_siswa` (PK), `nama`, `kelas`, `nis` (unique), and `password`.
-* `guru`: Manages teacher credentials and attributes including `id_guru` (PK), `nama`, `nip` (unique), and `password`.
-* `jenis_catatan`: Configures point criteria with `id_jenis` (PK), `nama`, `deskripsi`, `tipe` (pelanggaran/prestasi), and `poin`.
-* `catatan_siswa`: Core transactional table tracking behavioral entries with `id_catatan` (PK), links to teacher, student, and criteria IDs, date of execution, and custom note parameters.
+## Instalasi
 
----
+```bash
+git clone https://github.com/wibisanabama/ziepoint-app.git
+cd ziepoint-app
+```
 
-## 2. API Reference
+Direktori hasil clone adalah root repository. Aplikasi Flutter berada di subdirektori `ziepoint-app/`.
 
-All requests and responses use the JSON payload format. The server runs on default port `3000`.
+### 1. Database
 
-### 2.1. Authentication Endpoints
-* `POST /login`: Authenticates a student via `nis` and `password`.
-* `POST /login_guru`: Authenticates a teacher via `nip` and `password`.
+Siapkan database `db_sekolah` dengan tabel yang digunakan backend:
 
-### 2.2. Student Management
-* `GET /siswa`: Retrieves a list of all students.
-* `POST /siswa`: Creates a new student record.
-* `PUT /siswa/:id`: Updates an existing student record (identifying student via URL parameters).
-* `DELETE /siswa/:id`: Cascades the removal of point history logs and deletes the student profile.
+- `siswa`: data dan akun siswa.
+- `guru`: data dan akun guru.
+- `jenis_catatan`: kriteria, tipe, dan poin.
+- `catatan_siswa`: catatan yang menghubungkan siswa, guru, dan kriteria.
 
-### 2.3. Criteria Administration
-* `GET /jenis_catatan/:tipe`: Fetches catalog items filtered by type (`pelanggaran` or `prestasi`).
-* `POST /jenis_catatan`: Creates a new criteria catalog item.
-* `PUT /jenis_catatan/:id`: Modifies details of an existing criteria item.
-* `DELETE /jenis_catatan/:id`: Removes criteria items from the active schema.
+Repository belum menyertakan skema SQL, migrasi, atau seed akun. Struktur tabel harus disediakan sesuai query dalam `api-siswa-node/app.js`. Akun guru harus tersedia di database sebelum login.
 
-### 2.4. Infraction & Achievement Logging
-* `POST /catatan`: Creates a transaction log entry mapping behavior criteria to a student, under teacher authorization.
-* `GET /catatan/siswa/:id_siswa`: Pulls a joined list of infractions and achievements mapped to a specific student ID, automatically formatting timestamps and returning points metadata.
+### 2. Backend
 
----
+Dari root repository:
 
-## 3. Installation & Setup
+```bash
+cd api-siswa-node
+npm install
+node app.js
+```
 
-### 3.1. Prerequisites
-* Flutter SDK (3.22.0 or higher recommended)
-* Node.js (v18 or higher recommended)
-* MySQL Server (v8.0 recommended)
+Backend menggunakan konfigurasi environment berikut:
 
-### 3.2. Database Configuration
-1. Initialize the MySQL server.
-2. Create a database instance named `db_sekolah`.
-3. Import the system schema tables (`siswa`, `guru`, `jenis_catatan`, `catatan_siswa`).
-4. Ensure at least one teacher profile is populated inside the `guru` table for administration login.
+| Variabel | Nilai default | Keterangan |
+| --- | --- | --- |
+| `DB_HOST` | `localhost` | Host MySQL |
+| `DB_USER` | `root` | Pengguna MySQL |
+| `DB_PASSWORD` | Kosong | Password MySQL |
+| `DB_NAME` | `db_sekolah` | Nama database |
+| `PORT` | `3000` | Port HTTP backend |
+| `ALLOWED_ORIGINS` | `http://localhost` | Origin CORS tambahan, dipisahkan koma |
 
-### 3.3. Backend Server Setup
-1. Navigate to the api directory:
-   ```bash
-   cd api-siswa-node
-   ```
-2. Install the production dependencies:
-   ```bash
-   npm install
-   ```
-3. Configure the environment variables (optional, or use local defaults):
-   * `DB_HOST`: Database server host address (default: `localhost`).
-   * `DB_USER`: Database login user (default: `root`).
-   * `DB_PASSWORD`: Database login credential (default: empty string).
-   * `DB_NAME`: Target database instance (default: `db_sekolah`).
-   * `PORT`: Node server hosting port (default: `3000`).
-4. Start the service:
-   ```bash
-   node app.js
-   ```
+Tetapkan environment variable pada terminal sebelum menjalankan backend jika konfigurasi berbeda. Aplikasi tidak memuat file `.env` secara otomatis.
 
-### 3.4. Flutter Client Configuration
-1. Navigate back to the project root:
-   ```bash
-   cd ..
-   ```
-2. Fetch package dependencies:
-   ```bash
-   flutter pub get
-   ```
-3. Configure connection address:
-   * By default, the `ApiService` targets `http://localhost:3000`.
-   * For physical mobile test runs on Android devices, update the `baseUrl` inside `lib/services/api_service.dart` to match your local network IP (or `http://10.0.2.2:3000` inside standard Android Emulator containers).
-4. Run the project:
-   ```bash
-   flutter run
-   ```
+### 3. Aplikasi Mobile
+
+Atur `baseUrl` pada `ziepoint-app/lib/services/api_service.dart`:
+
+- Android Emulator: `http://10.0.2.2:3000` (konfigurasi saat ini).
+- Perangkat fisik: gunakan alamat IP jaringan komputer yang menjalankan backend.
+- iOS Simulator: gunakan alamat backend yang dapat dijangkau simulator.
+
+Sesuaikan port jika `PORT` backend diubah. Biarkan backend berjalan, lalu buka terminal baru dari root repository:
+
+```bash
+cd ziepoint-app
+flutter pub get
+flutter run
+```
+
+Pilih emulator atau perangkat Android/iOS yang terhubung.
+
+## Pemeriksaan Kode
+
+Dari root repository:
+
+```bash
+node --check api-siswa-node/app.js
+cd ziepoint-app
+flutter analyze
+```
+
+Pemeriksaan ini tidak menguji koneksi database atau alur aplikasi secara menyeluruh.
